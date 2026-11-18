@@ -25,19 +25,19 @@ def prim(graph):
                 visited.add(node)
                 for neighbor, w in graph[node]:
                     heappush(frontier, (w, neighbor, node))    
-                    # compare with dijkstra:
-                    # heappush(frontier, (distance + weight, neighbor))                
-
                 return prim_helper(visited, frontier, tree)
         
-    # pick first node as source arbitrarily
-    source = list(graph.keys())[0]
-    frontier = []
-    heappush(frontier, (0, source, source))
-    visited = set()  # store the visited nodes (don't need distance anymore)
-    tree = set()
-    prim_helper(visited, frontier, tree)
-    return tree
+    visited = set()  # shared across all components
+    trees = []
+    for source in graph:
+        # start a new tree from any node not yet in a tree
+        if source not in visited:
+            frontier = []
+            heappush(frontier, (0, source, source))
+            tree = set()
+            prim_helper(visited, frontier, tree)
+            trees.append(tree)
+    return trees
 
 def mst_from_points(points):
     """
@@ -53,7 +53,15 @@ def mst_from_points(points):
       tree connecting the cities in the input.
     """
     ###TODO
-    pass
+    graph = defaultdict(set)
+    for i in range(len(points)):
+        for j in range(i + 1, len(points)):
+            p1, p2 = points[i], points[j]
+            d = euclidean_distance(p1, p2)
+            graph[p1[0]].add((p2[0], d))
+            graph[p2[0]].add((p1[0], d))
+    # the graph is connected, so prim returns exactly one tree
+    return list(prim(graph)[0])
 
 def euclidean_distance(p1, p2):
     return sqrt((p1[1] - p2[1])**2 + (p1[2] - p2[2])**2)
