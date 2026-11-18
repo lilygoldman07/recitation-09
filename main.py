@@ -53,6 +53,8 @@ def mst_from_points(points):
       tree connecting the cities in the input.
     """
     ###TODO
+    if len(points) <= 1:
+        return []
     graph = defaultdict(set)
     for i in range(len(points)):
         for j in range(i + 1, len(points)):
